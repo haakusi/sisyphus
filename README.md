@@ -2,19 +2,60 @@
 
 Advanced agent orchestration plugin that transforms Claude Code into a senior engineer workflow.
 
-## One-Line Install
+## Quick Start (팀원용)
 
-### From Internal GitLab (Recommended)
-```bash
-/plugin install git:gitlab.suprema.co.kr/claude-code/sisyphus
-```
+### 1. 최초 설치 (1회만)
 
-### Manual Install
 ```bash
-git clone git@gitlab.suprema.co.kr:claude-code/sisyphus.git
+# 레포 클론
+git clone http://192.168.1.18:8080/claude-code/sisyphus.git
 cd sisyphus
-npm install && npm run build
+
+# 설치 (의존성 + 빌드 + 스킬 symlink)
+npm install
+npm run build
+npm run setup
 ```
+
+### 2. Claude Code에 플러그인 등록
+
+```bash
+claude plugin add sisyphus@local --path <sisyphus 폴더 경로>
+claude plugin enable sisyphus@local
+```
+
+### 3. (선택) 프로젝트에 Sisyphus 기본 적용
+
+`/ultrawork` 없이도 Sisyphus 모드를 기본으로 사용하려면:
+
+```bash
+# 프로젝트 루트에 CLAUDE.md 복사
+cp <sisyphus>/templates/CLAUDE.md <your-project>/CLAUDE.md
+```
+
+이후 해당 프로젝트에서 Claude Code 실행 시 자동으로 Sisyphus 모드 적용.
+
+---
+
+## 업데이트 방법
+
+### 스킬/기능 업데이트 시
+
+```bash
+cd sisyphus
+git pull
+# 끝! 스킬은 symlink라 자동 반영됨
+```
+
+### 새 스킬 추가 시 (관리자가 추가한 경우)
+
+```bash
+git pull
+npm run build
+npm run setup   # 새 스킬 symlink 추가
+```
+
+---
 
 ## What's Included
 
@@ -34,6 +75,7 @@ npm install && npm run build
 | `/loop <task>` | Continuous execution until task completion |
 | `/stats [period]` | Session metrics and cost estimates |
 | `/deep-research <topic>` | Thorough multi-source research |
+| `/setup-mcp` | MCP server configuration helper |
 
 ### MCP Tools
 
@@ -55,10 +97,6 @@ npm install && npm run build
 - `ast_find_imports` - Find import statements
 - `ast_list_rules` - List available refactoring rules
 
-#### Utility Tools
-- `sanitize_comments` - Remove AI-generated redundant comments
-- `sisyphus_stats` - Session statistics
-
 ## Requirements
 
 - Node.js 18+
@@ -70,41 +108,33 @@ npm install && npm run build
 npm install -g @ast-grep/cli typescript-language-server typescript
 ```
 
-## Installation Methods
-
-| Method | Command | Use Case |
-|--------|---------|----------|
-| **GitLab (Internal)** | `/plugin install git:gitlab.suprema.co.kr/claude-code/sisyphus` | Internal team (Recommended) |
-| **Manual** | `git clone git@gitlab.suprema.co.kr:claude-code/sisyphus.git` | Direct clone |
-
 ## Project Structure
 
 ```
-claude-sisyphus-plugin/
+sisyphus/
 ├── src/
 │   ├── servers/           # MCP server implementations
-│   │   ├── tools-server.ts   # Combined server (recommended)
-│   │   ├── lsp-server.ts     # LSP-only server
-│   │   └── ast-server.ts     # AST-only server
 │   ├── tools/
 │   │   ├── lsp/           # LSP client and tools
 │   │   ├── ast-grep/      # AST-grep engine and tools
 │   │   └── comment-sanitizer/
-│   ├── hooks/             # 25 extension hooks
+│   ├── hooks/             # Extension hooks
 │   ├── context/           # Auto-inject and monitoring
 │   ├── metrics/           # Session tracking
 │   └── scripts/
 │       └── setup.ts       # Installation script
-├── skills/                # Slash command definitions
+├── skills/                # Slash command definitions (symlinked)
 │   ├── ultrawork/
 │   ├── plan/
 │   ├── quick/
 │   ├── loop/
 │   ├── stats/
-│   └── deep-research/
+│   ├── deep-research/
+│   └── setup-mcp/
+├── templates/
+│   └── CLAUDE.md          # Sisyphus 기본 모드 템플릿
 └── mcp/
-    ├── recommended-servers.json  # External MCP server configs
-    └── setup-mcp-servers.ps1    # Setup script for extras
+    └── recommended-servers.json
 ```
 
 ## Usage Examples
@@ -127,6 +157,16 @@ claude-sisyphus-plugin/
 ### Continuous Loop
 ```
 /loop migrate all API endpoints to v2
+```
+
+## Auto-Update Architecture
+
+```
+sisyphus/skills/          ← 마스터 소스 (git 관리)
+        ↓ symlink
+~/.claude/skills/         ← Claude Code가 읽는 위치
+
+git pull 하면 ~/.claude/skills/ 에 자동 반영!
 ```
 
 ## License
