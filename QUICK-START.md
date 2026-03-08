@@ -67,16 +67,57 @@ Claude Code에서 다음 명령어로 테스트:
 
 ### 2개 MCP 서버 (코드 분석 도구)
 
-#### LSP 도구 (Language Server Protocol)
-- `lsp_goto_definition` - 함수/변수 정의로 이동
-- `lsp_find_references` - 모든 참조 찾기
-- `lsp_rename` - 안전한 리네임 (전체 프로젝트)
-- `lsp_diagnostics` - 에러/경고 조회
+플러그인 설치 시 **자동으로 등록**됩니다. 직접 도구 이름을 호출할 필요 없이 자연어로 요청하면 Claude가 알아서 사용합니다.
 
-#### AST-Grep 도구 (구조적 코드 검색)
-- `ast_search` - 패턴 기반 코드 검색 (정규식보다 정확)
-- `ast_replace` - 구조적 코드 치환
-- `ast_refactor` - 내장 리팩토링 규칙 적용
+```
+사용자: "getUserById 함수 정의 어디있어?"
+Claude: (자동으로 적절한 도구 선택) → "src/services/user.ts:45에 있습니다"
+```
+
+#### LSP (Language Server Protocol) - IDE 수준의 코드 인텔리전스
+
+| 도구 | 기능 | 자연어 요청 예시 |
+|------|------|------------------|
+| `lsp_goto_definition` | 함수/변수 정의 위치로 이동 | "이 함수 어디서 정의됐어?" |
+| `lsp_find_references` | 모든 참조 찾기 | "이 함수 어디서 호출돼?" |
+| `lsp_rename` | 전체 프로젝트에서 안전하게 이름 변경 | "이 변수 이름 바꿔줘" |
+| `lsp_hover` | 타입 정보, 문서 표시 | "이 변수 타입이 뭐야?" |
+| `lsp_diagnostics` | 에러/경고 조회 | "이 파일 에러 있어?" |
+
+#### AST-Grep - 구조적 패턴 매칭 (정규식보다 정확)
+
+| 도구 | 기능 | 자연어 요청 예시 |
+|------|------|------------------|
+| `ast_search` | 패턴으로 코드 검색 | "console.log 다 찾아줘" |
+| `ast_replace` | 구조적 코드 치환 | "var를 const로 바꿔줘" |
+| `ast_refactor` | 내장 리팩토링 규칙 | "이 파일 리팩토링해줘" |
+| `ast_find_functions` | 모든 함수 정의 찾기 | "함수 목록 보여줘" |
+| `ast_find_classes` | 모든 클래스 찾기 | "클래스 구조 보여줘" |
+
+#### 언제 뭘 써야 하나? (Claude가 자동 선택)
+
+| 상황 | 사용되는 도구 |
+|------|--------------|
+| "이 함수 정의 어디야?" | LSP `lsp_goto_definition` |
+| "이 변수 어디서 사용돼?" | LSP `lsp_find_references` |
+| "console.log 다 찾아줘" | AST `ast_search` |
+| "var를 const로 바꿔줘" | AST `ast_replace` |
+| "이 함수 이름 바꿔줘" | LSP `lsp_rename` |
+| "모든 async 함수 찾아줘" | AST `ast_search` |
+
+#### MCP 도구 사용을 위한 선택적 설치
+
+MCP 서버가 완전히 작동하려면 아래 도구들이 필요합니다:
+
+```bash
+# AST-grep CLI (ast_search, ast_replace 등)
+npm install -g @ast-grep/cli
+
+# TypeScript Language Server (LSP 도구들)
+npm install -g typescript-language-server typescript
+```
+
+> 없어도 플러그인 기본 기능(스킬)은 동작하지만, MCP 도구 사용 시 에러가 발생합니다.
 
 ### 병렬 에이전트 시스템
 
