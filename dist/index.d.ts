@@ -4,7 +4,7 @@
  * Main entry point for the Sisyphus-style agent orchestration plugin.
  */
 export { defaultAvailableAgents } from './agents/index.js';
-export type { Agent, Task, Todo, Intent, Skill, BackgroundTask, AvailableAgent, AgentCategory } from './agents/types.js';
+export type { Agent, Task, Todo, Intent, Skill, BackgroundTask, AvailableAgent, AgentCategory, } from './agents/types.js';
 export * from './orchestrator/index.js';
 export * from './hooks/index.js';
 export * from './skills/index.js';
@@ -12,6 +12,9 @@ export * from './prompts/index.js';
 export { getConfig, initializeConfig, isHookEnabled, isToolEnabled } from './config/index.js';
 export * from './tools/index.js';
 export * from './context/index.js';
+export * from './memory/index.js';
+export * from './artifacts/index.js';
+export * from './policy/index.js';
 import type { Skill, TodoItem } from './agents/types.js';
 import type { AvailableTool } from './prompts/dynamic-builder.js';
 export interface PluginContext {

@@ -143,6 +143,14 @@ npm install -g typescript-language-server typescript
 
 > 없어도 플러그인 기본 기능(스킬)은 동작하지만, MCP 도구 사용 시 에러가 발생합니다.
 
+### Omnibus 전용 MCP 서버 (선택)
+
+컨텍스트/메모리/정책 점검 기능을 분리 운영하려면 아래 서버를 사용할 수 있습니다.
+
+- `node dist/servers/memory-server.js`
+- `node dist/servers/artifact-server.js`
+- `node dist/servers/policy-server.js`
+
 ### 병렬 에이전트 시스템
 
 독립적인 작업을 동시에 처리:

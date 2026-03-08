@@ -138,6 +138,31 @@ const SkillsConfigSchema = z.object({
 });
 
 // ============================================
+// Memory & Context Configuration Schema
+// ============================================
+
+const MemoryConfigSchema = z.object({
+  enabled: z.boolean().default(true),
+  backend: z.enum(['auto', 'sqlite', 'file']).default('auto'),
+  maxRecords: z.number().positive().default(10000),
+  maxSearchResults: z.number().positive().default(20),
+  tokenBudget: z.number().positive().default(8000),
+});
+
+const ContextPackConfigSchema = z.object({
+  enabled: z.boolean().default(true),
+  tokenBudget: z.number().positive().default(15000),
+  maxLayerEntries: z.number().positive().default(12),
+  memoryLookback: z.number().positive().default(10),
+});
+
+const ArtifactDriftConfigSchema = z.object({
+  enabled: z.boolean().default(true),
+  failOnMismatch: z.boolean().default(false),
+  maxIssues: z.number().positive().default(200),
+});
+
+// ============================================
 // Main Configuration Schema
 // ============================================
 
@@ -162,6 +187,15 @@ export const SisyphusConfigSchema = z.object({
 
   // External model integrations (Gemini, Codex, etc.)
   externalModels: ExternalModelsConfigSchema.optional(),
+
+  // Persistent memory settings
+  memory: MemoryConfigSchema.optional(),
+
+  // Context-pack compiler settings
+  contextPack: ContextPackConfigSchema.optional(),
+
+  // Artifact drift-check settings
+  artifactDrift: ArtifactDriftConfigSchema.optional(),
 
   // Disabled hooks (by name)
   disabledHooks: z.array(z.string()).default([]),
@@ -189,12 +223,25 @@ export type HooksConfig = z.infer<typeof HooksConfigSchema>;
 export type SkillsConfig = z.infer<typeof SkillsConfigSchema>;
 export type ExternalModelsConfig = z.infer<typeof ExternalModelsConfigSchema>;
 export type CredentialConfig = z.infer<typeof CredentialSchema>;
+export type MemoryConfig = z.infer<typeof MemoryConfigSchema>;
+export type ContextPackConfig = z.infer<typeof ContextPackConfigSchema>;
+export type ArtifactDriftConfig = z.infer<typeof ArtifactDriftConfigSchema>;
 
 // ============================================
 // Default Configuration
 // ============================================
 
-export const DEFAULT_CONFIG: SisyphusConfig = SisyphusConfigSchema.parse({});
+export const DEFAULT_CONFIG: SisyphusConfig = SisyphusConfigSchema.parse({
+  agents: {},
+  concurrency: {},
+  todoEnforcer: {},
+  hooks: {},
+  skills: {},
+  externalModels: {},
+  memory: {},
+  contextPack: {},
+  artifactDrift: {},
+});
 
 // ============================================
 // Validation Helper
@@ -216,5 +263,9 @@ export function mergeConfig(
     todoEnforcer: { ...base.todoEnforcer, ...override.todoEnforcer },
     hooks: { ...base.hooks, ...override.hooks },
     skills: { ...base.skills, ...override.skills },
+    externalModels: { ...base.externalModels, ...override.externalModels },
+    memory: { ...base.memory, ...override.memory },
+    contextPack: { ...base.contextPack, ...override.contextPack },
+    artifactDrift: { ...base.artifactDrift, ...override.artifactDrift },
   });
 }

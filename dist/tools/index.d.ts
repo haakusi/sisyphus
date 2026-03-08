@@ -6,4 +6,5 @@
 export * from './lsp/index.js';
 export * from './ast-grep/index.js';
 export * from './comment-sanitizer/index.js';
+export * from './omnibus/index.js';
 //# sourceMappingURL=index.d.ts.map

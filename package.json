@@ -8,7 +8,10 @@
   "bin": {
     "sisyphus-lsp": "./dist/servers/lsp-server.js",
     "sisyphus-ast": "./dist/servers/ast-server.js",
-    "sisyphus-tools": "./dist/servers/tools-server.js"
+    "sisyphus-tools": "./dist/servers/tools-server.js",
+    "sisyphus-memory": "./dist/servers/memory-server.js",
+    "sisyphus-artifact": "./dist/servers/artifact-server.js",
+    "sisyphus-policy": "./dist/servers/policy-server.js"
   },
   "scripts": {
     "build": "tsc",
@@ -18,6 +21,9 @@
     "start:lsp": "node dist/servers/lsp-server.js",
     "start:ast": "node dist/servers/ast-server.js",
     "start:tools": "node dist/servers/tools-server.js",
+    "start:memory": "node dist/servers/memory-server.js",
+    "start:artifact": "node dist/servers/artifact-server.js",
+    "start:policy": "node dist/servers/policy-server.js",
     "install:deps": "npm install && npm run build",
     "setup": "node dist/scripts/setup.js"
   },

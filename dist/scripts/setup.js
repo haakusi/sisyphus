@@ -165,18 +165,37 @@ function registerMCPServers() {
     if (!config.mcpServers) {
         config.mcpServers = {};
     }
-    // Path to tools server
+    // Paths to bundled servers
     const toolsServerPath = path.join(PLUGIN_ROOT, 'dist', 'servers', 'tools-server.js');
-    // Add Sisyphus tools server
+    const memoryServerPath = path.join(PLUGIN_ROOT, 'dist', 'servers', 'memory-server.js');
+    const artifactServerPath = path.join(PLUGIN_ROOT, 'dist', 'servers', 'artifact-server.js');
+    const policyServerPath = path.join(PLUGIN_ROOT, 'dist', 'servers', 'policy-server.js');
+    // Add unified tools server
     config.mcpServers['sisyphus-tools'] = {
         command: 'node',
         args: [toolsServerPath],
         env: {},
     };
+    // Add dedicated omnibus servers
+    config.mcpServers['sisyphus-memory'] = {
+        command: 'node',
+        args: [memoryServerPath],
+        env: {},
+    };
+    config.mcpServers['sisyphus-artifact'] = {
+        command: 'node',
+        args: [artifactServerPath],
+        env: {},
+    };
+    config.mcpServers['sisyphus-policy'] = {
+        command: 'node',
+        args: [policyServerPath],
+        env: {},
+    };
     // Write config
     try {
         fs.writeFileSync(MCP_CONFIG_PATH, JSON.stringify(config, null, 2));
-        log(`Registered sisyphus-tools MCP server ✓`, 'success');
+        log(`Registered sisyphus-tools/memory/artifact/policy MCP servers ✓`, 'success');
         log(`Config saved to: ${MCP_CONFIG_PATH}`, 'info');
         return true;
     }

@@ -15,3 +15,11 @@ export {
   type InjectionResult,
   type AutoInjectConfig,
 } from './auto-inject.js';
+
+export {
+  buildContextPack,
+  formatContextPackMarkdown,
+  type ContextReference,
+  type ContextPack,
+  type ContextPackOptions,
+} from './context-pack.js';

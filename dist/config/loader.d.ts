@@ -16,30 +16,5 @@ export declare function updateConfig(update: Partial<SisyphusConfig>): SisyphusC
 export declare function resetConfig(): void;
 export declare function isHookEnabled(hookName: string): boolean;
 export declare function isToolEnabled(toolName: string): boolean;
-export declare function getAgentConfig(agentName: keyof SisyphusConfig['agents']): {
-    model?: string;
-    temperature?: number;
-    maxTokens?: number;
-    thinkingBudget?: number;
-} | {
-    model?: string;
-    temperature?: number;
-    maxTokens?: number;
-    thinkingBudget?: number;
-} | {
-    model?: string;
-    temperature?: number;
-    maxTokens?: number;
-    thinkingBudget?: number;
-} | {
-    model?: string;
-    temperature?: number;
-    maxTokens?: number;
-    thinkingBudget?: number;
-} | {
-    model?: string;
-    temperature?: number;
-    maxTokens?: number;
-    thinkingBudget?: number;
-};
+export declare function getAgentConfig(agentName: keyof NonNullable<SisyphusConfig['agents']>): any;
 //# sourceMappingURL=loader.d.ts.map

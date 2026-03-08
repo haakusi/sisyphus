@@ -2,12 +2,12 @@
   "$schema": "https://claude.ai/mcp-schema.json",
   "sisyphus-lsp": {
     "command": "node",
-    "args": ["${pluginDir}/dist/servers/lsp-server.js"],
+    "args": ["${HOME}/.claude-sisyphus/dist/servers/lsp-server.js"],
     "env": {}
   },
   "sisyphus-ast-grep": {
     "command": "node",
-    "args": ["${pluginDir}/dist/servers/ast-server.js"],
+    "args": ["${HOME}/.claude-sisyphus/dist/servers/ast-server.js"],
     "env": {}
   }
 }

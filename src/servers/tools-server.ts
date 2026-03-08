@@ -59,6 +59,15 @@ import {
   mcpListPresets,
 } from '../tools/mcp-manager/index.js';
 
+import {
+  memoryAppend,
+  memorySearch,
+  memoryCompact,
+  artifactDriftStatus,
+  policyActiveRules,
+  buildContextPackTool,
+} from '../tools/omnibus/index.js';
+
 // Create server instance
 const server = new Server(
   {
@@ -336,6 +345,92 @@ const ALL_TOOLS = [
       properties: {},
     },
   },
+  {
+    name: 'memory_append',
+    description: 'Append persistent memory record (decision/execution/pattern/failure).',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        projectRoot: { type: 'string' },
+        kind: { type: 'string' },
+        content: { type: 'string' },
+        scope: { type: 'string' },
+        tags: { type: 'array', items: { type: 'string' } },
+        confidence: { type: 'number' },
+        sourceRef: { type: 'string' },
+        sessionId: { type: 'string' },
+      },
+      required: ['kind', 'content'],
+    },
+  },
+  {
+    name: 'memory_search',
+    description: 'Search persistent memory records.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        projectRoot: { type: 'string' },
+        query: { type: 'string' },
+        limit: { type: 'number' },
+        kinds: { type: 'array', items: { type: 'string' } },
+        scopes: { type: 'array', items: { type: 'string' } },
+        minConfidence: { type: 'number' },
+      },
+    },
+  },
+  {
+    name: 'memory_compact',
+    description: 'Store context compaction snapshot and/or generated context pack.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        projectRoot: { type: 'string' },
+        summary: { type: 'string' },
+        taskDescription: { type: 'string' },
+        scope: { type: 'string' },
+        tags: { type: 'array', items: { type: 'string' } },
+        sessionId: { type: 'string' },
+        sourceRef: { type: 'string' },
+        includeContextPack: { type: 'boolean' },
+      },
+    },
+  },
+  {
+    name: 'artifact_drift_status',
+    description: 'Detect drift between canonical and pinned artifact versions.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        projectRoot: { type: 'string' },
+      },
+    },
+  },
+  {
+    name: 'policy_active_rules',
+    description: 'Resolve active MUST/SHOULD rules from project guidance docs.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        projectRoot: { type: 'string' },
+        limit: { type: 'number' },
+      },
+    },
+  },
+  {
+    name: 'context_pack_build',
+    description: 'Build context pack (global/sprint/execution layers + memory slice).',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        projectRoot: { type: 'string' },
+        taskDescription: { type: 'string' },
+        workingFiles: { type: 'array', items: { type: 'string' } },
+        tokenBudget: { type: 'number' },
+        maxLayerEntries: { type: 'number' },
+        memoryLookback: { type: 'number' },
+      },
+    },
+  },
 ];
 
 // List tools
@@ -469,6 +564,58 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         result = await mcpListPresets();
         break;
 
+      // Omnibus Tools
+      case 'memory_append':
+        result = await memoryAppend(args as {
+          projectRoot?: string;
+          kind: string;
+          content: string;
+          scope?: string;
+          tags?: string[];
+          confidence?: number;
+          sourceRef?: string;
+          sessionId?: string;
+        });
+        break;
+      case 'memory_search':
+        result = await memorySearch(args as {
+          projectRoot?: string;
+          query?: string;
+          limit?: number;
+          kinds?: string[];
+          scopes?: string[];
+          minConfidence?: number;
+        });
+        break;
+      case 'memory_compact':
+        result = await memoryCompact(args as {
+          projectRoot?: string;
+          summary?: string;
+          taskDescription?: string;
+          scope?: string;
+          tags?: string[];
+          sessionId?: string;
+          sourceRef?: string;
+          includeContextPack?: boolean;
+        });
+        break;
+      case 'artifact_drift_status':
+        result = await artifactDriftStatus(args as { projectRoot?: string });
+        break;
+      case 'policy_active_rules':
+        result = await policyActiveRules(args as { projectRoot?: string; limit?: number });
+        break;
+      case 'context_pack_build':
+        result = await buildContextPackTool(args as {
+          projectRoot?: string;
+          taskDescription?: string;
+          workingFiles?: string[];
+          tokenBudget?: number;
+          maxLayerEntries?: number;
+          memoryLookback?: number;
+        });
+        break;
+
       default:
         throw new McpError(ErrorCode.MethodNotFound, `Unknown tool: ${name}`);
     }
@@ -497,7 +644,7 @@ async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
   console.error('Sisyphus Tools MCP Server running on stdio');
-  console.error('Available: LSP tools, AST-grep tools, Comment sanitizer, Metrics');
+  console.error('Available: LSP, AST-grep, comment-sanitizer, metrics, memory/policy/drift/context');
 }
 
 main().catch((error) => {

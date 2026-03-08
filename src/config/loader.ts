@@ -142,7 +142,8 @@ export function isToolEnabled(toolName: string): boolean {
   return !config.disabledTools.includes(toolName);
 }
 
-export function getAgentConfig(agentName: keyof SisyphusConfig['agents']) {
+export function getAgentConfig(agentName: keyof NonNullable<SisyphusConfig['agents']>) {
   const config = getConfig();
-  return config.agents[agentName];
+  const agents = config.agents || DEFAULT_CONFIG.agents;
+  return agents[agentName];
 }

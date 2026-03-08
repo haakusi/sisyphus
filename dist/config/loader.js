@@ -109,6 +109,7 @@ export function isToolEnabled(toolName) {
 }
 export function getAgentConfig(agentName) {
     const config = getConfig();
-    return config.agents[agentName];
+    const agents = config.agents || DEFAULT_CONFIG.agents;
+    return agents[agentName];
 }
 //# sourceMappingURL=loader.js.map
