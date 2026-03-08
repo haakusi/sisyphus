@@ -1,0 +1,49 @@
+{
+  "$schema": "../schemas/preset.schema.json",
+  "name": "Backend Team",
+  "description": "APIs, databases, microservices, server-side development",
+
+  "modelStrategy": {
+    "default": "sonnet",
+    "rules": [
+      { "pattern": "api|endpoint|route|controller", "model": "sonnet" },
+      { "pattern": "search|find|list|grep", "model": "haiku" },
+      { "pattern": "database|schema|migration", "model": "sonnet" },
+      { "pattern": "security|auth|encryption", "model": "opus" },
+      { "pattern": "architecture|scale|performance", "model": "opus" }
+    ]
+  },
+
+  "agents": {
+    "explorer": {
+      "model": "haiku",
+      "description": "Fast API and service search"
+    },
+    "analyzer": {
+      "model": "sonnet",
+      "description": "Code flow and dependency analysis"
+    },
+    "security": {
+      "model": "opus",
+      "description": "Security review and architecture"
+    }
+  },
+
+  "concurrency": {
+    "maxParallel": 3,
+    "preferParallel": true
+  },
+
+  "keywords": [
+    "api", "rest", "graphql", "grpc",
+    "database", "sql", "nosql", "orm",
+    "microservice", "queue", "cache",
+    "authentication", "authorization", "jwt"
+  ],
+
+  "filePatterns": [
+    "**/*.ts", "**/*.js", "**/*.py", "**/*.go", "**/*.java",
+    "**/controllers/**", "**/services/**", "**/models/**",
+    "**/routes/**", "**/middleware/**", "**/repositories/**"
+  ]
+}

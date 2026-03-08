@@ -1,0 +1,289 @@
+{
+  "$schema": "./recommended-servers.schema.json",
+  "version": "1.0.0",
+  "description": "Recommended MCP servers for Sisyphus/Ultrawork plugin",
+  "servers": {
+    "figma": {
+      "name": "Figma MCP Server",
+      "description": "Figma 디자인을 React 컴포넌트로 변환, Tailwind CSS 스타일 추출",
+      "category": "ui-ux",
+      "source": "npm",
+      "package": "@anthropic/mcp-server-figma",
+      "command": "npx",
+      "args": ["-y", "@anthropic/mcp-server-figma"],
+      "env": {
+        "FIGMA_ACCESS_TOKEN": "${FIGMA_ACCESS_TOKEN}"
+      },
+      "requiredEnvVars": ["FIGMA_ACCESS_TOKEN"],
+      "setupUrl": "https://www.figma.com/developers/api#access-tokens",
+      "tools": [
+        "get_file",
+        "get_file_nodes",
+        "get_images",
+        "get_comments",
+        "get_team_projects",
+        "get_project_files"
+      ],
+      "useCases": [
+        "Figma 디자인 파일 읽기",
+        "디자인 → React 컴포넌트 변환",
+        "Tailwind CSS 클래스 추출",
+        "디자인 시스템 분석"
+      ],
+      "teams": ["frontend", "design"]
+    },
+    "figma-context": {
+      "name": "Figma Context MCP",
+      "description": "Figma 레이아웃 정보를 AI에 전달 (Cursor/Claude용)",
+      "category": "ui-ux",
+      "source": "github",
+      "repository": "GLips/Figma-Context-MCP",
+      "command": "npx",
+      "args": ["-y", "figma-context-mcp"],
+      "env": {
+        "FIGMA_PERSONAL_ACCESS_TOKEN": "${FIGMA_ACCESS_TOKEN}"
+      },
+      "requiredEnvVars": ["FIGMA_ACCESS_TOKEN"],
+      "tools": [
+        "get_figma_data"
+      ],
+      "useCases": [
+        "Figma 프레임 컨텍스트 추출",
+        "컴포넌트 계층 구조 분석"
+      ],
+      "teams": ["frontend"]
+    },
+    "openapi": {
+      "name": "OpenAPI MCP Server (AWS Labs)",
+      "description": "Swagger/OpenAPI 스펙에서 MCP 도구 자동 생성",
+      "category": "backend",
+      "source": "npm",
+      "package": "@aws/mcp-server-openapi",
+      "command": "npx",
+      "args": ["-y", "@aws/mcp-server-openapi", "--spec", "${OPENAPI_SPEC_PATH}"],
+      "env": {
+        "OPENAPI_SPEC_PATH": "${OPENAPI_SPEC_PATH}"
+      },
+      "requiredEnvVars": [],
+      "tools": [
+        "Dynamic - based on OpenAPI spec"
+      ],
+      "useCases": [
+        "API 엔드포인트 자동 발견",
+        "API 호출 테스트",
+        "스키마 분석"
+      ],
+      "teams": ["backend", "devops"]
+    },
+    "swagger": {
+      "name": "Swagger MCP",
+      "description": "OpenAPI/Swagger 정의를 MCP 도구로 래핑 (캐싱 지원)",
+      "category": "backend",
+      "source": "npm",
+      "package": "swagger-mcp",
+      "command": "npx",
+      "args": ["-y", "swagger-mcp", "--url", "${SWAGGER_URL}"],
+      "env": {
+        "SWAGGER_URL": "${SWAGGER_URL}"
+      },
+      "requiredEnvVars": ["SWAGGER_URL"],
+      "tools": [
+        "list_operations",
+        "execute_operation",
+        "get_schema"
+      ],
+      "useCases": [
+        "Swagger 문서 기반 API 탐색",
+        "API 엔드포인트 실행"
+      ],
+      "teams": ["backend"]
+    },
+    "context7": {
+      "name": "Context7 (Upstash)",
+      "description": "최신 라이브러리 문서를 버전별로 자동 가져오기",
+      "category": "documentation",
+      "source": "npm",
+      "package": "@upstash/context7-mcp",
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp"],
+      "env": {},
+      "requiredEnvVars": [],
+      "tools": [
+        "resolve-library-id",
+        "get-library-docs"
+      ],
+      "useCases": [
+        "React 18 문서 가져오기",
+        "최신 Next.js 문서 참조",
+        "라이브러리 버전별 차이 확인"
+      ],
+      "teams": ["frontend", "backend", "all"]
+    },
+    "github": {
+      "name": "GitHub MCP Server (Official)",
+      "description": "GitHub 리포지토리, 이슈, PR 직접 접근 및 관리",
+      "category": "integration",
+      "source": "npm",
+      "package": "@github/mcp-server",
+      "command": "npx",
+      "args": ["-y", "@github/mcp-server"],
+      "env": {
+        "GITHUB_TOKEN": "${GITHUB_TOKEN}"
+      },
+      "requiredEnvVars": ["GITHUB_TOKEN"],
+      "setupUrl": "https://github.com/settings/tokens",
+      "tools": [
+        "search_repositories",
+        "get_file_contents",
+        "create_or_update_file",
+        "push_files",
+        "search_code",
+        "create_issue",
+        "create_pull_request",
+        "list_issues",
+        "get_issue"
+      ],
+      "useCases": [
+        "리포지토리 검색 및 탐색",
+        "이슈 생성/관리",
+        "PR 생성/리뷰",
+        "코드 검색"
+      ],
+      "teams": ["all"]
+    },
+    "github-project-manager": {
+      "name": "GitHub Project Manager MCP",
+      "description": "GitHub Projects 자동화, AI 기반 태스크 관리",
+      "category": "project-management",
+      "source": "github",
+      "repository": "kunwarVivek/mcp-github-project-manager",
+      "command": "npx",
+      "args": ["-y", "mcp-github-project-manager"],
+      "env": {
+        "GITHUB_TOKEN": "${GITHUB_TOKEN}"
+      },
+      "requiredEnvVars": ["GITHUB_TOKEN"],
+      "tools": [
+        "create_project",
+        "add_item",
+        "update_item_status",
+        "get_project_items",
+        "analyze_project_progress"
+      ],
+      "useCases": [
+        "GitHub Projects 관리",
+        "태스크 자동 생성",
+        "진행 상황 분석"
+      ],
+      "teams": ["planning", "devops"]
+    },
+    "microsoft-docs": {
+      "name": "Microsoft Docs MCP",
+      "description": "Microsoft 공식 문서 접근 (Azure, .NET, TypeScript 등)",
+      "category": "documentation",
+      "source": "github",
+      "repository": "MicrosoftDocs/mcp",
+      "command": "npx",
+      "args": ["-y", "@microsoft/mcp-docs-server"],
+      "env": {},
+      "requiredEnvVars": [],
+      "tools": [
+        "search_docs",
+        "get_article",
+        "get_api_reference"
+      ],
+      "useCases": [
+        "Azure 서비스 문서 조회",
+        ".NET API 참조",
+        "TypeScript 공식 문서"
+      ],
+      "teams": ["backend", "devops"]
+    },
+    "filesystem": {
+      "name": "Filesystem MCP Server (Official)",
+      "description": "안전한 파일 시스템 접근 (디렉토리 제한)",
+      "category": "utility",
+      "source": "npm",
+      "package": "@modelcontextprotocol/server-filesystem",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "${WORKSPACE_ROOT}"],
+      "env": {
+        "WORKSPACE_ROOT": "${WORKSPACE_ROOT}"
+      },
+      "requiredEnvVars": ["WORKSPACE_ROOT"],
+      "tools": [
+        "read_file",
+        "read_multiple_files",
+        "write_file",
+        "create_directory",
+        "list_directory",
+        "move_file",
+        "search_files",
+        "get_file_info"
+      ],
+      "useCases": [
+        "파일 읽기/쓰기",
+        "디렉토리 탐색",
+        "파일 검색"
+      ],
+      "teams": ["all"]
+    },
+    "software-planning": {
+      "name": "Software Planning MCP",
+      "description": "소프트웨어 개발 계획 및 태스크 분해",
+      "category": "project-management",
+      "source": "github",
+      "repository": "NightTrek/Software-planning-mcp",
+      "command": "npx",
+      "args": ["-y", "software-planning-mcp"],
+      "env": {},
+      "requiredEnvVars": [],
+      "tools": [
+        "create_plan",
+        "break_down_task",
+        "estimate_complexity",
+        "identify_dependencies"
+      ],
+      "useCases": [
+        "프로젝트 계획 수립",
+        "태스크 분해",
+        "복잡도 추정"
+      ],
+      "teams": ["planning", "backend", "frontend"]
+    }
+  },
+  "presets": {
+    "frontend": {
+      "description": "프론트엔드 개발팀용 MCP 서버 세트",
+      "servers": ["figma", "figma-context", "context7", "github", "filesystem"]
+    },
+    "backend": {
+      "description": "백엔드 개발팀용 MCP 서버 세트",
+      "servers": ["openapi", "swagger", "context7", "github", "filesystem", "microsoft-docs"]
+    },
+    "devops": {
+      "description": "DevOps팀용 MCP 서버 세트",
+      "servers": ["github", "github-project-manager", "filesystem", "microsoft-docs"]
+    },
+    "planning": {
+      "description": "기획/설계팀용 MCP 서버 세트",
+      "servers": ["github", "github-project-manager", "software-planning", "context7"]
+    },
+    "full": {
+      "description": "모든 MCP 서버 활성화",
+      "servers": ["figma", "figma-context", "openapi", "swagger", "context7", "github", "github-project-manager", "microsoft-docs", "filesystem", "software-planning"]
+    }
+  },
+  "installation": {
+    "notes": [
+      "각 서버는 독립적으로 설치 가능",
+      "환경 변수는 .env 파일 또는 시스템 환경 변수로 설정",
+      "GITHUB_TOKEN은 repo, read:org 권한 필요",
+      "FIGMA_ACCESS_TOKEN은 Figma 개발자 설정에서 생성"
+    ],
+    "globalDependencies": [
+      "Node.js >= 18",
+      "npx (npm 포함)"
+    ]
+  }
+}

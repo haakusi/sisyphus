@@ -1,0 +1,344 @@
+/**
+ * Enhanced Grep MCP Server
+ *
+ * Provides semantic-aware grep capabilities.
+ */
+
+import { Server } from '@modelcontextprotocol/sdk/server/index.js';
+import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import {
+  CallToolRequestSchema,
+  ListToolsRequestSchema,
+} from '@modelcontextprotocol/sdk/types.js';
+import * as fs from 'fs';
+import * as path from 'path';
+
+const server = new Server(
+  {
+    name: 'sisyphus-grep',
+    version: '1.0.0',
+  },
+  {
+    capabilities: {
+      tools: {},
+    },
+  }
+);
+
+// Tool definitions
+server.setRequestHandler(ListToolsRequestSchema, async () => {
+  return {
+    tools: [
+      {
+        name: 'semantic_grep',
+        description: 'Search for code patterns with semantic awareness (understands imports, definitions, usages)',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            pattern: {
+              type: 'string',
+              description: 'Search pattern (regex or semantic query)',
+            },
+            path: {
+              type: 'string',
+              description: 'Directory to search in',
+            },
+            type: {
+              type: 'string',
+              enum: ['literal', 'regex', 'definition', 'usage', 'import'],
+              description: 'Type of search',
+            },
+            fileTypes: {
+              type: 'array',
+              items: { type: 'string' },
+              description: 'File extensions to include (e.g., [".ts", ".js"])',
+            },
+            maxResults: {
+              type: 'number',
+              description: 'Maximum number of results',
+            },
+          },
+          required: ['pattern'],
+        },
+      },
+      {
+        name: 'find_definitions',
+        description: 'Find where a symbol is defined',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            symbol: {
+              type: 'string',
+              description: 'Symbol name to find',
+            },
+            path: {
+              type: 'string',
+              description: 'Directory to search in',
+            },
+          },
+          required: ['symbol'],
+        },
+      },
+      {
+        name: 'find_usages',
+        description: 'Find all usages of a symbol',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            symbol: {
+              type: 'string',
+              description: 'Symbol name to find usages of',
+            },
+            path: {
+              type: 'string',
+              description: 'Directory to search in',
+            },
+          },
+          required: ['symbol'],
+        },
+      },
+    ],
+  };
+});
+
+// Tool execution
+server.setRequestHandler(CallToolRequestSchema, async (request) => {
+  const { name, arguments: args } = request.params;
+
+  switch (name) {
+    case 'semantic_grep':
+      return await semanticGrep(args as SemanticGrepArgs);
+
+    case 'find_definitions':
+      return await findDefinitions(args as FindArgs);
+
+    case 'find_usages':
+      return await findUsages(args as FindArgs);
+
+    default:
+      throw new Error(`Unknown tool: ${name}`);
+  }
+});
+
+// Types
+interface SemanticGrepArgs {
+  pattern: string;
+  path?: string;
+  type?: 'literal' | 'regex' | 'definition' | 'usage' | 'import';
+  fileTypes?: string[];
+  maxResults?: number;
+}
+
+interface FindArgs {
+  symbol: string;
+  path?: string;
+}
+
+interface SearchResult {
+  file: string;
+  line: number;
+  column: number;
+  content: string;
+  context?: string;
+}
+
+// Implementation
+async function semanticGrep(args: SemanticGrepArgs) {
+  const searchPath = args.path || process.cwd();
+  const maxResults = args.maxResults || 50;
+  const searchType = args.type || 'literal';
+
+  const results: SearchResult[] = [];
+  const pattern = buildPattern(args.pattern, searchType);
+
+  await searchDirectory(searchPath, pattern, args.fileTypes, results, maxResults);
+
+  return {
+    content: [
+      {
+        type: 'text',
+        text: formatResults(results, args.pattern),
+      },
+    ],
+  };
+}
+
+async function findDefinitions(args: FindArgs) {
+  const searchPath = args.path || process.cwd();
+  const results: SearchResult[] = [];
+
+  // Patterns for common definition styles
+  const patterns = [
+    new RegExp(`(?:function|const|let|var|class|interface|type|enum)\\s+${escapeRegex(args.symbol)}\\b`),
+    new RegExp(`${escapeRegex(args.symbol)}\\s*[=:]\\s*(?:function|class|\\(|{)`),
+    new RegExp(`export\\s+(?:default\\s+)?(?:function|const|class)\\s+${escapeRegex(args.symbol)}\\b`),
+  ];
+
+  for (const pattern of patterns) {
+    await searchDirectory(searchPath, pattern, undefined, results, 20);
+  }
+
+  // Deduplicate
+  const unique = deduplicateResults(results);
+
+  return {
+    content: [
+      {
+        type: 'text',
+        text: formatResults(unique, `definition of ${args.symbol}`),
+      },
+    ],
+  };
+}
+
+async function findUsages(args: FindArgs) {
+  const searchPath = args.path || process.cwd();
+  const results: SearchResult[] = [];
+
+  // Pattern for usages (not definitions)
+  const pattern = new RegExp(`(?<!(?:function|const|let|var|class|interface|type|enum)\\s+)\\b${escapeRegex(args.symbol)}\\b`);
+
+  await searchDirectory(searchPath, pattern, undefined, results, 100);
+
+  return {
+    content: [
+      {
+        type: 'text',
+        text: formatResults(results, `usages of ${args.symbol}`),
+      },
+    ],
+  };
+}
+
+// Helper functions
+function buildPattern(input: string, type: string): RegExp {
+  switch (type) {
+    case 'regex':
+      return new RegExp(input, 'g');
+    case 'definition':
+      return new RegExp(`(?:function|const|let|var|class|interface|type)\\s+${escapeRegex(input)}\\b`);
+    case 'usage':
+      return new RegExp(`\\b${escapeRegex(input)}\\b`);
+    case 'import':
+      return new RegExp(`(?:import|from|require).*${escapeRegex(input)}`);
+    default:
+      return new RegExp(escapeRegex(input), 'g');
+  }
+}
+
+function escapeRegex(str: string): string {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+async function searchDirectory(
+  dir: string,
+  pattern: RegExp,
+  fileTypes: string[] | undefined,
+  results: SearchResult[],
+  maxResults: number
+): Promise<void> {
+  if (results.length >= maxResults) return;
+
+  try {
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+
+    for (const entry of entries) {
+      if (results.length >= maxResults) break;
+
+      const fullPath = path.join(dir, entry.name);
+
+      // Skip common ignore patterns
+      if (shouldIgnore(entry.name)) continue;
+
+      if (entry.isDirectory()) {
+        await searchDirectory(fullPath, pattern, fileTypes, results, maxResults);
+      } else if (entry.isFile()) {
+        if (fileTypes && !fileTypes.some(ext => entry.name.endsWith(ext))) {
+          continue;
+        }
+
+        await searchFile(fullPath, pattern, results, maxResults);
+      }
+    }
+  } catch {
+    // Skip inaccessible directories
+  }
+}
+
+async function searchFile(
+  filePath: string,
+  pattern: RegExp,
+  results: SearchResult[],
+  maxResults: number
+): Promise<void> {
+  try {
+    const content = fs.readFileSync(filePath, 'utf-8');
+    const lines = content.split('\n');
+
+    for (let i = 0; i < lines.length && results.length < maxResults; i++) {
+      const line = lines[i];
+      const match = line.match(pattern);
+
+      if (match) {
+        results.push({
+          file: filePath,
+          line: i + 1,
+          column: match.index || 0,
+          content: line.trim(),
+          context: getContext(lines, i),
+        });
+      }
+    }
+  } catch {
+    // Skip unreadable files
+  }
+}
+
+function getContext(lines: string[], index: number): string {
+  const start = Math.max(0, index - 1);
+  const end = Math.min(lines.length, index + 2);
+  return lines.slice(start, end).join('\n');
+}
+
+function shouldIgnore(name: string): boolean {
+  const ignorePatterns = [
+    'node_modules', '.git', 'dist', 'build', '.next', '.nuxt',
+    '__pycache__', '.pytest_cache', 'venv', '.venv',
+    '.DS_Store', 'Thumbs.db',
+  ];
+  return ignorePatterns.includes(name) || name.startsWith('.');
+}
+
+function deduplicateResults(results: SearchResult[]): SearchResult[] {
+  const seen = new Set<string>();
+  return results.filter(r => {
+    const key = `${r.file}:${r.line}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function formatResults(results: SearchResult[], query: string): string {
+  if (results.length === 0) {
+    return `No results found for: ${query}`;
+  }
+
+  const lines = [`Found ${results.length} results for: ${query}\n`];
+
+  for (const result of results) {
+    lines.push(`${result.file}:${result.line}:${result.column}`);
+    lines.push(`  ${result.content}`);
+    lines.push('');
+  }
+
+  return lines.join('\n');
+}
+
+// Start server
+async function main() {
+  const transport = new StdioServerTransport();
+  await server.connect(transport);
+}
+
+main().catch(console.error);

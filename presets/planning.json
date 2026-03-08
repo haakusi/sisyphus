@@ -1,0 +1,48 @@
+{
+  "$schema": "../schemas/preset.schema.json",
+  "name": "Design/Planning Team",
+  "description": "Requirements, specifications, UX design, project planning",
+
+  "modelStrategy": {
+    "default": "opus",
+    "rules": [
+      { "pattern": "search|find|list", "model": "haiku" },
+      { "pattern": "document|readme|spec", "model": "sonnet" },
+      { "pattern": "requirement|user story|acceptance", "model": "opus" },
+      { "pattern": "design|ux|flow|wireframe", "model": "opus" },
+      { "pattern": "decision|trade-off|compare", "model": "opus" }
+    ]
+  },
+
+  "agents": {
+    "explorer": {
+      "model": "haiku",
+      "description": "Fast document and spec search"
+    },
+    "researcher": {
+      "model": "sonnet",
+      "description": "Documentation and reference analysis"
+    },
+    "strategist": {
+      "model": "opus",
+      "description": "Requirements and design decisions"
+    }
+  },
+
+  "concurrency": {
+    "maxParallel": 2,
+    "preferParallel": false
+  },
+
+  "keywords": [
+    "requirement", "specification", "user story",
+    "design", "ux", "wireframe", "prototype",
+    "architecture", "decision", "trade-off",
+    "roadmap", "milestone", "epic"
+  ],
+
+  "filePatterns": [
+    "**/*.md", "**/docs/**", "**/specs/**",
+    "**/requirements/**", "**/design/**"
+  ]
+}

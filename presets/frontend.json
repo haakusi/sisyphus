@@ -1,0 +1,47 @@
+{
+  "$schema": "../schemas/preset.schema.json",
+  "name": "Frontend Team",
+  "description": "React, Vue, Tailwind, UI/UX focused development",
+
+  "modelStrategy": {
+    "default": "sonnet",
+    "rules": [
+      { "pattern": "component|react|vue|css|style|tailwind", "model": "sonnet" },
+      { "pattern": "search|find|list|glob", "model": "haiku" },
+      { "pattern": "architecture|design system|pattern", "model": "opus" }
+    ]
+  },
+
+  "agents": {
+    "explorer": {
+      "model": "haiku",
+      "description": "Fast component and style search"
+    },
+    "analyzer": {
+      "model": "sonnet",
+      "description": "UI/UX pattern analysis"
+    },
+    "architect": {
+      "model": "opus",
+      "description": "Design system decisions"
+    }
+  },
+
+  "concurrency": {
+    "maxParallel": 5,
+    "preferParallel": true
+  },
+
+  "keywords": [
+    "react", "vue", "angular", "svelte",
+    "css", "scss", "tailwind", "styled-components",
+    "component", "hook", "state", "props",
+    "responsive", "animation", "accessibility"
+  ],
+
+  "filePatterns": [
+    "**/*.tsx", "**/*.jsx", "**/*.vue",
+    "**/*.css", "**/*.scss", "**/*.module.css",
+    "**/components/**", "**/hooks/**", "**/styles/**"
+  ]
+}

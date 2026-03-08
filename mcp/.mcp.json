@@ -1,0 +1,17 @@
+{
+  "$schema": "https://claude.ai/mcp-schema.json",
+  "mcpServers": {
+    "sisyphus-lsp": {
+      "command": "node",
+      "args": ["${pluginDir}/dist/servers/lsp-server.js"],
+      "disabled": false,
+      "env": {}
+    },
+    "sisyphus-ast-grep": {
+      "command": "node",
+      "args": ["${pluginDir}/dist/servers/ast-server.js"],
+      "disabled": false,
+      "env": {}
+    }
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "$schema": "https://anthropic.com/claude-code/plugin.schema.json",
+  "name": "sisyphus",
+  "description": "Sisyphus orchestration plugin - parallel agents, TODO management, LSP/AST tools for maximum productivity",
+  "version": "1.0.0",
+  "author": {
+    "name": "Suprema AI Team",
+    "email": "ai@suprema.co.kr"
+  },
+  "homepage": "http://gitlab.suprema.co.kr/claude-code/sisyphus",
+  "repository": "git@gitlab.suprema.co.kr:claude-code/sisyphus.git",
+  "license": "MIT",
+  "keywords": [
+    "orchestration",
+    "parallel-agents",
+    "todo",
+    "lsp",
+    "ast-grep",
+    "productivity"
+  ],
+  "engines": {
+    "claude-code": ">=2.0.0"
+  },
+  "postInstall": "npm install && npm run build"
+}

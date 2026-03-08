@@ -1,0 +1,50 @@
+{
+  "$schema": "../schemas/preset.schema.json",
+  "name": "DevOps/Infra Team",
+  "description": "CI/CD, Docker, Kubernetes, infrastructure automation",
+
+  "modelStrategy": {
+    "default": "haiku",
+    "rules": [
+      { "pattern": "config|yaml|json|env", "model": "haiku" },
+      { "pattern": "docker|container|image", "model": "haiku" },
+      { "pattern": "kubernetes|k8s|helm", "model": "sonnet" },
+      { "pattern": "pipeline|ci|cd|deploy", "model": "sonnet" },
+      { "pattern": "architecture|scaling|disaster", "model": "opus" },
+      { "pattern": "security|secret|vault", "model": "opus" }
+    ]
+  },
+
+  "agents": {
+    "explorer": {
+      "model": "haiku",
+      "description": "Fast config and manifest search"
+    },
+    "analyzer": {
+      "model": "sonnet",
+      "description": "Pipeline and deployment analysis"
+    },
+    "architect": {
+      "model": "opus",
+      "description": "Infrastructure architecture decisions"
+    }
+  },
+
+  "concurrency": {
+    "maxParallel": 3,
+    "preferParallel": true
+  },
+
+  "keywords": [
+    "docker", "kubernetes", "k8s", "helm",
+    "terraform", "ansible", "pulumi",
+    "ci", "cd", "pipeline", "github-actions",
+    "monitoring", "logging", "alerting"
+  ],
+
+  "filePatterns": [
+    "**/Dockerfile*", "**/docker-compose*.yml",
+    "**/*.yaml", "**/*.yml", "**/k8s/**",
+    "**/.github/workflows/**", "**/terraform/**"
+  ]
+}

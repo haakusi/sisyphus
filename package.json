@@ -1,0 +1,57 @@
+{
+  "name": "claude-sisyphus-plugin",
+  "version": "1.0.0",
+  "description": "Sisyphus-style agent orchestration plugin for Claude Code",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "sisyphus-lsp": "./dist/servers/lsp-server.js",
+    "sisyphus-ast": "./dist/servers/ast-server.js",
+    "sisyphus-tools": "./dist/servers/tools-server.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "vitest",
+    "lint": "eslint src --ext .ts",
+    "start:lsp": "node dist/servers/lsp-server.js",
+    "start:ast": "node dist/servers/ast-server.js",
+    "start:tools": "node dist/servers/tools-server.js",
+    "install:deps": "npm install && npm run build",
+    "setup": "node dist/scripts/setup.js"
+  },
+  "keywords": [
+    "claude-code",
+    "plugin",
+    "agent",
+    "orchestration",
+    "sisyphus",
+    "mcp"
+  ],
+  "author": "Suprema AI Team <ai@suprema.co.kr>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git@gitlab.suprema.co.kr:claude-code/sisyphus.git"
+  },
+  "homepage": "http://gitlab.suprema.co.kr/claude-code/sisyphus",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.25.3",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.0",
+    "vitest": "^1.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "dist",
+    "skills",
+    "commands",
+    "mcp"
+  ]
+}
