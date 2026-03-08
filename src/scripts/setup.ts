@@ -16,12 +16,15 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { execSync, spawnSync } from 'child_process';
 import * as os from 'os';
+import { fileURLToPath } from 'url';
 
 // ============================================
 // Configuration
 // ============================================
 
-const PLUGIN_ROOT = path.resolve(import.meta.dirname, '../..');
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const PLUGIN_ROOT = path.resolve(__dirname, '../..');
 const CLAUDE_DIR = path.join(os.homedir(), '.claude');
 const SKILLS_DIR = path.join(CLAUDE_DIR, 'skills');
 const MCP_CONFIG_PATH = path.join(CLAUDE_DIR, 'claude_desktop_config.json');
