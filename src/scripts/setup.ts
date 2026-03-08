@@ -26,7 +26,15 @@ const CLAUDE_DIR = path.join(os.homedir(), '.claude');
 const SKILLS_DIR = path.join(CLAUDE_DIR, 'skills');
 const MCP_CONFIG_PATH = path.join(CLAUDE_DIR, 'claude_desktop_config.json');
 
-const SKILLS_TO_INSTALL = ['ultrawork', 'plan', 'quick', 'loop', 'stats', 'deep-research', 'setup-mcp'];
+const SKILLS_TO_INSTALL = [
+  // Core skills
+  'ultrawork', 'plan', 'quick', 'loop', 'stats', 'deep-research', 'setup-mcp',
+  // Keyword aliases
+  'ulw',           // ultrawork shorthand
+  'search',        // parallel exploration (search/find)
+  'analyze',       // deep analysis (analyze/investigate)
+  'ultrathink',    // extended thinking (think deeply)
+];
 
 // Colors for terminal output
 const colors = {

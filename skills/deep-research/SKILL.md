@@ -1,6 +1,8 @@
 ---
 name: deep-research
-description: Perform thorough research across multiple sources. Use deep-research, research, or investigate keywords.
+description: Perform thorough research across multiple sources. Use deep-research, research, investigate, or analyze keywords for comprehensive analysis.
+allowed-tools: Task, Glob, Grep, Read, WebSearch, WebFetch
+argument-hint: <research topic>
 ---
 
 # Deep Research Skill

@@ -37,6 +37,42 @@ cp <sisyphus>/templates/CLAUDE.md <your-project>/CLAUDE.md
 
 ---
 
+## 키워드 트리거 (Keyword Triggers)
+
+슬래시 명령 없이도 키워드만으로 스킬이 자동 활성화됩니다.
+
+| 키워드 | 활성화 기능 | 설명 |
+|--------|-------------|------|
+| `ultrawork` / `ulw` / `sisyphus` | Sisyphus 오케스트레이터 | 병렬 실행, 자동 위임, TODO 추적 |
+| `search` / `find` | 병렬 탐색 모드 | 코드베이스 빠른 검색 |
+| `analyze` / `investigate` / `examine` | 심층 분석 모드 | 코드/버그 깊은 분석 |
+| `research` / `deep-research` | 연구 모드 | 다중 소스 종합 연구 |
+| `ultrathink` / `think deeply` / `think hard` | Extended Thinking | 복잡한 문제 심층 사고 |
+
+### 사용 예시
+
+```
+# 슬래시 명령 방식
+/ultrawork 사용자 인증 구현해줘
+
+# 키워드 방식 (동일하게 동작)
+ultrawork 사용자 인증 구현해줘
+ulw 사용자 인증 구현해줘
+
+# 검색
+search 로그인 관련 파일 찾아줘
+find authentication 구현 위치
+
+# 분석
+analyze 이 버그 원인 파악해줘
+investigate 성능 저하 원인
+
+# 깊은 사고
+ultrathink 이 아키텍처 최적화 방안
+```
+
+---
+
 ## 업데이트 방법
 
 ### 스킬/기능 업데이트 시
@@ -59,7 +95,7 @@ npm run setup   # 새 스킬 symlink 추가
 
 ## What's Included
 
-- **7 Skills**: /ultrawork, /plan, /quick, /loop, /stats, /setup-mcp, /deep-research
+- **11 Skills**: /ultrawork, /ulw, /plan, /quick, /loop, /stats, /setup-mcp, /deep-research, /search, /analyze, /ultrathink
 - **2 MCP Servers**: LSP tools, AST-grep tools
 - **Parallel Agents**: Explore, Plan, general-purpose
 
@@ -67,15 +103,18 @@ npm run setup   # 새 스킬 symlink 추가
 
 ### Skills (Slash Commands)
 
-| Skill | Description |
-|-------|-------------|
-| `/ultrawork <task>` | Full Sisyphus mode with parallel agents and TODO tracking |
-| `/plan <task>` | Structured planning with requirements gathering |
-| `/quick <task>` | Fast execution for simple tasks (uses Haiku) |
-| `/loop <task>` | Continuous execution until task completion |
-| `/stats [period]` | Session metrics and cost estimates |
-| `/deep-research <topic>` | Thorough multi-source research |
-| `/setup-mcp` | MCP server configuration helper |
+| Skill | Keyword Triggers | Description |
+|-------|------------------|-------------|
+| `/ultrawork` | ultrawork, ulw, sisyphus | Full Sisyphus mode with parallel agents and TODO tracking |
+| `/plan` | plan | Structured planning with requirements gathering |
+| `/quick` | quick | Fast execution for simple tasks (uses Haiku) |
+| `/loop` | loop | Continuous execution until task completion |
+| `/stats` | stats | Session metrics and cost estimates |
+| `/deep-research` | research, investigate | Thorough multi-source research |
+| `/search` | search, find | Parallel codebase exploration |
+| `/analyze` | analyze, examine | Deep code analysis mode |
+| `/ultrathink` | ultrathink, think deeply | Extended thinking for complex problems |
+| `/setup-mcp` | - | MCP server configuration helper |
 
 ### MCP Tools
 
@@ -124,7 +163,10 @@ sisyphus/
 │   └── scripts/
 │       └── setup.ts       # Installation script
 ├── skills/                # Slash command definitions (symlinked)
-│   ├── ultrawork/
+│   ├── ultrawork/         # + ulw alias
+│   ├── search/            # search/find keywords
+│   ├── analyze/           # analyze/investigate keywords
+│   ├── ultrathink/        # think deeply keyword
 │   ├── plan/
 │   ├── quick/
 │   ├── loop/
@@ -142,6 +184,8 @@ sisyphus/
 ### Ultrawork Mode
 ```
 /ultrawork implement user authentication with OAuth2
+ultrawork implement user authentication with OAuth2
+ulw implement user authentication with OAuth2
 ```
 
 ### Quick Fix
@@ -149,14 +193,22 @@ sisyphus/
 /quick fix the typo in error message
 ```
 
-### Planning Mode
+### Search Mode
 ```
-/plan refactor the database layer for better performance
+search 로그인 관련 코드
+find authentication implementation
 ```
 
-### Continuous Loop
+### Analysis Mode
 ```
-/loop migrate all API endpoints to v2
+analyze 이 함수의 성능 문제
+investigate memory leak
+```
+
+### Deep Thinking
+```
+ultrathink 마이크로서비스 아키텍처 설계
+think deeply about caching strategy
 ```
 
 ## Auto-Update Architecture
