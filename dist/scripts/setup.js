@@ -22,7 +22,7 @@ const PLUGIN_ROOT = path.resolve(import.meta.dirname, '../..');
 const CLAUDE_DIR = path.join(os.homedir(), '.claude');
 const SKILLS_DIR = path.join(CLAUDE_DIR, 'skills');
 const MCP_CONFIG_PATH = path.join(CLAUDE_DIR, 'claude_desktop_config.json');
-const SKILLS_TO_INSTALL = ['ultrawork', 'plan', 'quick', 'loop', 'stats', 'deep-research'];
+const SKILLS_TO_INSTALL = ['ultrawork', 'plan', 'quick', 'loop', 'stats', 'deep-research', 'setup-mcp'];
 // Colors for terminal output
 const colors = {
     reset: '\x1b[0m',
@@ -175,16 +175,35 @@ function registerMCPServers() {
     }
 }
 // ============================================
-// Step 5: Copy Skills
+// Step 5: Link Skills (Symlink for auto-update)
 // ============================================
-function copySkills() {
-    header('Step 5: Installing Skills');
+function removeExisting(targetPath) {
+    if (!fs.existsSync(targetPath)) {
+        return;
+    }
+    const stats = fs.lstatSync(targetPath);
+    if (stats.isSymbolicLink()) {
+        // Remove symlink
+        fs.unlinkSync(targetPath);
+    }
+    else if (stats.isDirectory()) {
+        // Remove directory recursively
+        fs.rmSync(targetPath, { recursive: true, force: true });
+    }
+    else {
+        // Remove file
+        fs.unlinkSync(targetPath);
+    }
+}
+function linkSkills() {
+    header('Step 5: Linking Skills (Auto-update enabled)');
     // Ensure skills directory exists
     if (!fs.existsSync(SKILLS_DIR)) {
         fs.mkdirSync(SKILLS_DIR, { recursive: true });
         log(`Created ${SKILLS_DIR}`, 'info');
     }
     const sourceSkillsDir = path.join(PLUGIN_ROOT, 'skills');
+    const isWindows = os.platform() === 'win32';
     for (const skill of SKILLS_TO_INSTALL) {
         const sourcePath = path.join(sourceSkillsDir, skill);
         const destPath = path.join(SKILLS_DIR, skill);
@@ -193,14 +212,36 @@ function copySkills() {
             continue;
         }
         try {
-            // Copy recursively
-            copyDirectory(sourcePath, destPath);
-            log(`Installed skill: ${skill} ✓`, 'success');
+            // Remove existing link/directory
+            removeExisting(destPath);
+            // Create symlink (junction on Windows for no admin rights)
+            if (isWindows) {
+                // Use junction on Windows (no admin required)
+                fs.symlinkSync(sourcePath, destPath, 'junction');
+            }
+            else {
+                // Use dir symlink on Unix
+                fs.symlinkSync(sourcePath, destPath, 'dir');
+            }
+            log(`Linked skill: ${skill} → ${sourcePath} ✓`, 'success');
         }
         catch (error) {
-            log(`Failed to copy ${skill}: ${error}`, 'error');
+            log(`Failed to link ${skill}: ${error}`, 'error');
+            // Fallback to copy if symlink fails
+            log(`Falling back to copy for ${skill}...`, 'warn');
+            try {
+                copyDirectory(sourcePath, destPath);
+                log(`Copied skill: ${skill} (fallback) ✓`, 'success');
+            }
+            catch (copyError) {
+                log(`Failed to copy ${skill}: ${copyError}`, 'error');
+            }
         }
     }
+    log('', 'info');
+    log('Skills are now symlinked to the repo.', 'info');
+    log('After git pull, new skills will be available immediately.', 'info');
+    log('No need to run setup again for skill updates!', 'success');
     return true;
 }
 function copyDirectory(src, dest) {
@@ -338,7 +379,7 @@ ${colors.reset}
         { name: 'Dependencies', fn: installDependencies },
         { name: 'Build', fn: buildProject },
         { name: 'MCP Servers', fn: registerMCPServers },
-        { name: 'Skills', fn: copySkills },
+        { name: 'Skills', fn: linkSkills },
         { name: 'Environment', fn: createEnvTemplate },
         { name: 'Verification', fn: runVerification },
     ];
